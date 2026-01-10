@@ -1,0 +1,242 @@
+.ceh9-webform-modal-wrapper {
+    display: inline-block;
+}
+
+.ceh9-webform-modal-button {
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.ceh9-webform-modal-button:hover {
+    background-color: #0056b3;
+}
+
+.ceh9-webform-modal-button:active {
+    transform: translateY(1px);
+}
+
+.ceh9-webform-modal-content {
+    padding: 20px;
+}
+
+.ceh9-webform-title {
+    margin: 0 0 24px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.4;
+}
+
+.ceh9-webform-form {
+    width: 100%;
+}
+
+.ceh9-webform-field {
+    margin-bottom: 20px;
+}
+
+.ceh9-webform-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.ceh9-webform-label-required {
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+.ceh9-webform-input,
+.ceh9-webform-textarea,
+.ceh9-webform-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.ceh9-webform-input:focus,
+.ceh9-webform-textarea:focus,
+.ceh9-webform-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.ceh9-webform-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.ceh9-webform-select {
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.ceh9-webform-radio-group,
+.ceh9-webform-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ceh9-webform-radio-item,
+.ceh9-webform-checkbox-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.ceh9-webform-radio-input,
+.ceh9-webform-checkbox-input {
+    margin-top: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ceh9-webform-radio-label,
+.ceh9-webform-checkbox-label {
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    user-select: none;
+}
+
+.ceh9-webform-button {
+    width: 100%;
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.ceh9-webform-button:hover {
+    background-color: #0056b3;
+}
+
+.ceh9-webform-button:active {
+    transform: translateY(1px);
+}
+
+.ceh9-webform-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+}
+
+.ceh9-webform-messages {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.ceh9-webform-messages-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.ceh9-webform-messages-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.ceh9-webform-messages ul {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+}
+
+.ceh9-webform-messages li {
+    margin-bottom: 4px;
+}
+
+.ceh9-webform-form-hidden {
+    display: none;
+}
+
+.ceh9-webform-success-only {
+    padding: 20px;
+    text-align: center;
+}
+
+.ceh9-webform-agreement {
+    margin-bottom: 20px;
+}
+
+.ceh9-webform-agreement-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    user-select: none;
+}
+
+.ceh9-webform-agreement-checkbox {
+    margin-top: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ceh9-webform-agreement-text {
+    line-height: 1.5;
+}
+
+.ceh9-webform-agreement-text a {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+.ceh9-webform-agreement-text a:hover {
+    color: #0056b3;
+}
+
+.ceh9-webform-popup .bx-popup-window {
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.ceh9-webform-popup .bx-popup-window-content {
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .ceh9-webform-popup .bx-popup-window {
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .ceh9-webform-modal-content {
+        padding: 15px;
+    }
+    
+    .ceh9-webform-input,
+    .ceh9-webform-textarea,
+    .ceh9-webform-select {
+        font-size: 16px;
+    }
+}

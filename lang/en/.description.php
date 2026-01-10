@@ -1,0 +1,5 @@
+<?php 
+
+$MESS['CEH9_WEBFORM_COMPONENT_NAME'] = 'Contact form';
+$MESS['CEH9_WEBFORM_COMPONENT_DESCRIPTION'] = 'Contact form';
+
