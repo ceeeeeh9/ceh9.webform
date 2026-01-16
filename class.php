@@ -10,13 +10,16 @@ use Bitrix\Main\Engine\Contract\Controllerable;
 use Bitrix\Main\ErrorCollection;
 use Bitrix\Main\Error;
 use Bitrix\Main\Component\ParameterSigner;
+use Bitrix\Main\Engine\ActionFilter;
 
 class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
 {
     protected $errorCollection;
 
     const FIELD_TYPES_WITH_SID = ['dropdown', 'radio', 'checkbox', 'multiselect'];
+
     const TEXT_FIELD_TYPES = ['text', 'email', 'tel', 'url', 'date', 'integer', 'float', 'textarea'];
+
     const FIELD_TYPES_WITH_SELECTED = ['dropdown', 'multiselect'];
     const FIELD_TYPES_WITH_CHECKED = ['radio', 'checkbox'];
 
@@ -25,7 +28,6 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
     const DEFAULT_BUTTON_TEXT = 'CEH9_WEBFORM_DEFAULT_BUTTON_TEXT';
     const DEFAULT_SUCCESS_MESSAGE = 'CEH9_WEBFORM_SUCCESS_DEFAULT_MESSAGE';
     const DEFAULT_AGREEMENT_TEXT = 'CEH9_WEBFORM_AGREEMENT_TEXT_DEFAULT';
-    const DEFAULT_PHONE_FIELD_MASK = '+375 (99) 999-99-99';
 
     public function __construct($component = null)
     {
@@ -35,7 +37,15 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
 
     public function configureActions()
     {
-        return [];
+        return [
+            'submit' => [
+                'prefilters' => [
+                    new ActionFilter\HttpMethod([ActionFilter\HttpMethod::METHOD_POST]),
+                    new ActionFilter\Csrf(),
+                ],
+                'postfilters' => []
+            ]
+        ];
     }
 
     protected function listKeysSignedParameters()
@@ -63,9 +73,6 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
         $arParams['PHONE_FIELD_SID'] = isset($arParams['PHONE_FIELD_SID']) 
             ? trim($arParams['PHONE_FIELD_SID']) 
             : '';
-        $arParams['PHONE_FIELD_MASK'] = (isset($arParams['PHONE_FIELD_MASK']) && trim($arParams['PHONE_FIELD_MASK']) !== '') 
-            ? trim($arParams['PHONE_FIELD_MASK']) 
-            : self::DEFAULT_PHONE_FIELD_MASK;
         $arParams['CACHE_TIME'] = isset($arParams['CACHE_TIME']) 
             ? (int)$arParams['CACHE_TIME'] 
             : self::DEFAULT_CACHE_TIME;
@@ -129,7 +136,6 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
         $this->arResult['SUCCESS_MESSAGE'] = $this->arParams['SUCCESS_MESSAGE'];
         $this->arResult['AGREEMENT_TEXT'] = $this->arParams['AGREEMENT_TEXT'];
         $this->arResult['PHONE_FIELD_SID'] = $this->arParams['PHONE_FIELD_SID'];
-        $this->arResult['PHONE_FIELD_MASK'] = $this->arParams['PHONE_FIELD_MASK'];
         $this->arResult['FIELDS'] = $this->getFormFields($formId);
         $this->arResult['SIGNED_PARAMETERS'] = $this->getFormSignedParameters();
     }
