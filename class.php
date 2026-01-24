@@ -19,6 +19,7 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
     const FIELD_TYPES_WITH_SID = ['dropdown', 'radio', 'checkbox', 'multiselect'];
 
     const TEXT_FIELD_TYPES = ['text', 'email', 'tel', 'url', 'date', 'integer', 'float', 'textarea'];
+    const CACHE_VERSION = 2;
 
     const FIELD_TYPES_WITH_SELECTED = ['dropdown', 'multiselect'];
     const FIELD_TYPES_WITH_CHECKED = ['radio', 'checkbox'];
@@ -88,7 +89,13 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
             return;
         }
 
-        if ($this->startResultCache())
+        $cacheId = [
+            'v' => self::CACHE_VERSION,
+            'form' => (int)$this->arParams['WEB_FORM_ID'],
+            'lang' => defined('LANGUAGE_ID') ? LANGUAGE_ID : '',
+        ];
+
+        if ($this->startResultCache(false, $cacheId))
         {
             $this->prepareResult();
             $this->includeComponentTemplate();
@@ -200,7 +207,7 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
         $fieldType = $this->determineFieldType($answers, $field);
         $defaultValue = $this->getDefaultValue($answers, $fieldType);
         $processedAnswers = $this->processAnswers($answers, $fieldType);
-        $fieldName = $this->buildFieldName($fieldType, $field, $fieldId);
+        $fieldName = $this->buildFieldName($fieldType, $field, $fieldId, $answers);
 
         return [
             'ID' => $fieldId,
@@ -298,7 +305,7 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
             && $answer['FIELD_PARAM'] === 'CHECKED';
     }
 
-    protected function buildFieldName($fieldType, array $field, $fieldId)
+    protected function buildFieldName($fieldType, array $field, $fieldId, array $answers = [])
     {
         $typePrefix = strtolower($fieldType);
         
@@ -307,7 +314,13 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
             return sprintf('form_%s_%s', $typePrefix, $field['SID']);
         }
 
-        return sprintf('form_%s_%d', $typePrefix, $fieldId);
+        $answerId = 0;
+        if (!empty($answers) && isset($answers[0]['ID']))
+        {
+            $answerId = (int)$answers[0]['ID'];
+        }
+
+        return sprintf('form_%s_%d', $typePrefix, ($answerId > 0 ? $answerId : (int)$fieldId));
     }
 
     protected function getFormSignedParameters()
@@ -342,6 +355,8 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
                 Loc::getMessage('CEH9_WEBFORM_ERROR_SESSION_EXPIRED')
             );
         }
+
+        $formData = $this->normalizeFormData($formId, $formData);
 
         $validationErrors = $this->validateForm($formId, $formData);
         if (!empty($validationErrors))
@@ -382,6 +397,105 @@ class Ceh9WebFormComponent extends CBitrixComponent implements Controllerable
         }
 
         return $this->normalizeValidationErrors($errors);
+    }
+
+    protected function normalizeFormData($formId, array $formData)
+    {
+        $fields = $this->getFormFields($formId);
+        if (empty($fields))
+        {
+            return $formData;
+        }
+
+        foreach ($fields as $field)
+        {
+            if (!isset($field['TYPE']) || $field['TYPE'] !== 'date')
+            {
+                continue;
+            }
+
+            $name = isset($field['NAME']) ? $field['NAME'] : '';
+            if ($name === '' || !isset($formData[$name]))
+            {
+                $qid = isset($field['ID']) ? (int)$field['ID'] : 0;
+                $oldName = ($qid > 0) ? ('form_date_' . $qid) : '';
+                if ($oldName !== '' && isset($formData[$oldName]) && !isset($formData[$name]))
+                {
+                    $formData[$name] = $formData[$oldName];
+                }
+
+                if (!isset($formData[$name]))
+                {
+                    continue;
+                }
+            }
+
+            $value = $formData[$name];
+            if (!is_string($value))
+            {
+                continue;
+            }
+
+            $value = trim($value);
+            $parts = $this->parseDateParts($value);
+            if (!empty($parts))
+            {
+                $formData[$name] = $this->formatDateForSite($parts['Y'], $parts['M'], $parts['D']);
+            }
+        }
+
+        return $formData;
+    }
+
+    protected function parseDateParts($value)
+    {
+        // Accepts: YYYY-MM-DD, DD.MM.YYYY, DD/MM/YYYY
+        $value = trim((string)$value);
+
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $m))
+        {
+            return ['Y' => (int)$m[1], 'M' => (int)$m[2], 'D' => (int)$m[3]];
+        }
+
+        if (preg_match('/^(\d{2})\.(\d{2})\.(\d{4})$/', $value, $m))
+        {
+            return ['Y' => (int)$m[3], 'M' => (int)$m[2], 'D' => (int)$m[1]];
+        }
+
+        if (preg_match('/^(\d{2})\/(\d{2})\/(\d{4})$/', $value, $m))
+        {
+            return ['Y' => (int)$m[3], 'M' => (int)$m[2], 'D' => (int)$m[1]];
+        }
+
+        return [];
+    }
+
+    protected function formatDateForSite($year, $month, $day)
+    {
+        $fmt = '';
+        if (class_exists('CSite'))
+        {
+            $fmt = (string)CSite::GetDateFormat('SHORT');
+        }
+        if ($fmt === '' && defined('FORMAT_DATE'))
+        {
+            $fmt = (string)FORMAT_DATE;
+        }
+        if ($fmt === '')
+        {
+            $fmt = 'DD.MM.YYYY';
+        }
+
+        $out = $fmt;
+        $out = str_replace('YYYY', sprintf('%04d', (int)$year), $out);
+        $out = str_replace('YY', sprintf('%02d', (int)$year % 100), $out);
+        $out = str_replace('MM', sprintf('%02d', (int)$month), $out);
+        $out = str_replace('DD', sprintf('%02d', (int)$day), $out);
+
+        $out = str_replace('M', (string)(int)$month, $out);
+        $out = str_replace('D', (string)(int)$day, $out);
+
+        return $out;
     }
 
     protected function normalizeValidationErrors(array $errors)
